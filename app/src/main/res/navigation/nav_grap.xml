@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_grap"
+    app:startDestination="@id/homeFragment2">
+
+    <!-- Home Fragment -->
+    <fragment
+        android:id="@+id/homeFragment2"
+        android:name="com.example.movieapp.fragment.HomeFragment"
+        tools:layout="@layout/fragment_home"
+        android:label="HomeFragment">
+
+        <!-- Action to navigate to DetailsFragment -->
+        <action
+            android:id="@+id/action_homeFragment2_to_detailsFragment2"
+            app:destination="@id/detailsFragment2" />
+
+        <!-- Action to navigate to SearchFragment -->
+        <action
+            android:id="@+id/action_homeFragment2_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+
+    <!-- Details Fragment -->
+    <fragment
+        android:id="@+id/detailsFragment2"
+        android:name="com.example.movieapp.fragment.DetailsFragment"
+        tools:layout="@layout/fragment_details"
+        android:label="DetailsFragment">
+
+        <!-- Argument for movie ID -->
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
+
+    <!-- Search Fragment -->
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.movieapp.fragment.SearchFragment"
+        tools:layout="@layout/fragment_search"
+        android:label="SearchFragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_detailsFragment2"
+            app:destination="@id/detailsFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/popularFragment"
+        android:name="com.example.movieapp.fragment.PopularFragment"
+        android:label="PopularFragment" />
+
+</navigation>
