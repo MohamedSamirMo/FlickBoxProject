@@ -9,106 +9,134 @@
     android:background="@color/backgroundColor"
     tools:context=".MainActivity">
 
-    <!-- Horizontal layout for Search Icon and Search Input -->
-
-    <!-- Tabs for Popular and Top Rated -->
+    <!-- Search Layout -->
     <LinearLayout
         android:id="@+id/searchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Search Icon -->
         <ImageView
             android:id="@+id/iconSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:contentDescription="Search Icon"
-            android:padding="8dp"
-            android:src="@drawable/ic_search" />
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_search"
+            android:layout_marginEnd="8dp"
+            app:tint="@color/primaryColor" />
 
         <!-- Search Input -->
         <EditText
             android:id="@+id/searchInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:background="@drawable/rounded_edittext"
             android:hint="Search for movies..."
             android:inputType="text"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textColor="@android:color/black"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:textColorHint="@color/light_gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="wrap_content"
+    <!-- Horizontal ScrollView for Tabs -->
+    <android.widget.HorizontalScrollView
+        android:id="@+id/tabScrollView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/searchLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Popular Tab -->
-        <Button
-            android:id="@+id/tabPopular"
+        <!-- Tabs Layout inside ScrollView -->
+        <LinearLayout
+            android:id="@+id/tabLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Popular"
-            android:textSize="18sp"
-            android:textColor="@color/overviewColor"
-            android:paddingEnd="16dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:drawableBottom="@drawable/underline" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="16dp">
 
-        <!-- Top Rated Tab -->
-        <Button
-            android:id="@+id/tabTopRated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Top Rated"
-            android:textSize="18sp"
-            android:textColor="@color/custom_brown"
-            android:paddingStart="16dp"
-            android:background="?android:attr/selectableItemBackground" />
-    </LinearLayout>
+            <!-- Tab buttons -->
+            <Button
+                android:id="@+id/tabPopular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Popular"
+                android:textSize="20sp"
+                android:textColor="#E01010"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:drawableBottom="@drawable/underline" />
 
-    <!-- RecyclerView for displaying Movies -->
+            <Button
+                android:id="@+id/tabUpComing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upcoming"
+                android:textSize="20sp"
+                android:textColor="@color/dateColor"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:drawableBottom="@drawable/underline" />
+
+            <Button
+
+                android:id="@+id/tabNowPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Now Playing"
+                android:textSize="20sp"
+                android:textColor="@color/genresColor"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:drawableBottom="@drawable/underline" />
+
+            <Button
+                android:id="@+id/tabTopRated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Top Rated"
+                android:textSize="20sp"
+                android:textColor="#E92727"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:drawableBottom="@drawable/underline" />
+        </LinearLayout>
+    </android.widget.HorizontalScrollView>
+
+    <!-- RecyclerView for Movies -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recMovie"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
         android:paddingTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabScrollView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
         tools:listitem="@layout/item_movie" />
 
-    <!-- Centered ProgressBar -->
+    <!-- ProgressBar centered -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:indeterminate="true"
         android:visibility="gone"
+        android:indeterminate="true"
+        android:layout_centerInParent="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

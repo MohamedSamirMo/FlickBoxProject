@@ -5,19 +5,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.databinding.ItemMovieBinding
 import com.example.movieapp.models.MovieResult
+import com.example.movieapp.models.ResultPlay
 import com.example.movieapp.models.ResultPopular
 import com.example.movieapp.models.ResultTop
+import com.example.movieapp.models.ResultUpComing
 
 class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
 
     var movieList: ArrayList<MovieResult>? = null
     var topList: ArrayList<ResultTop>? = null
     var popularList: ArrayList<ResultPopular>? = null
+    var nowPlayingList: ArrayList<ResultPlay>? = null
+    var upcomingList: ArrayList<ResultUpComing>? = null
 
     var onItemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return Holder(ItemMovieBinding.inflate(android.view.LayoutInflater.from(parent.context), parent, false))
+
     }
 
     override fun getItemCount(): Int {
@@ -26,6 +31,8 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
             movieList != null -> movieList!!.size
             topList != null -> topList!!.size
             popularList != null -> popularList!!.size
+            nowPlayingList != null -> nowPlayingList!!.size
+            upcomingList != null -> upcomingList!!.size
             else -> 0
         }
     }
@@ -39,12 +46,22 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
         }
         topList?.let {
             if (position < it.size) {
-                holder.bind(it[position])
+                holder.bindTop(it[position])
             }
         }
         popularList?.let {
             if (position < it.size) {
-                holder.bind(it[position])
+                holder.bindPopular(it[position])
+            }
+        }
+        nowPlayingList?.let {
+            if (position < it.size) {
+                holder.bindNowPlaying(it[position])
+            }
+        }
+        upcomingList?.let {
+            if (position < it.size) {
+                holder.bindUpcoming(it[position])
             }
         }
     }
@@ -66,6 +83,12 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
                         popularList != null && position < popularList!!.size -> {
                             popularList?.get(position)?.id?.let { it1 -> onItemClickListener?.onItemClick(it1) }
                         }
+                        nowPlayingList != null && position < nowPlayingList!!.size -> {
+                            nowPlayingList?.get(position)?.id?.let { it1 -> onItemClickListener?.onItemClick(it1) }
+                        }
+                        upcomingList != null && position < upcomingList!!.size -> {
+                            upcomingList?.get(position)?.id?.let { it1 -> onItemClickListener?.onItemClick(it1) }
+                        }
                     }
                 }
             }
@@ -82,7 +105,7 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
             }
         }
 
-        fun bind(resultTop: ResultTop) {
+        fun bindTop(resultTop: ResultTop) {
             binding.apply {
                 movieTitle.text = resultTop.title
                 movieRating.text = "⭐  " + resultTop.vote_average.toString() + " / 10"
@@ -93,7 +116,7 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
             }
         }
 
-        fun bind(resultPopular: ResultPopular) {
+        fun bindPopular(resultPopular: ResultPopular) {
             binding.apply {
                 movieTitle.text = resultPopular.title
                 movieRating.text = "⭐  " + resultPopular.vote_average.toString() + " / 10"
@@ -103,16 +126,42 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.Holder>() {
                     .into(moviePoster)
             }
         }
+        fun bindNowPlaying(resultPlay: ResultPlay) {
+            binding.apply {
+                movieTitle.text = resultPlay.title
+                movieRating.text = "⭐  " + resultPlay.vote_average.toString() + " / 10"
+                movieDescription.text = resultPlay.overview
+                Glide.with(binding.root)
+                    .load("https://image.tmdb.org/t/p/w500" + resultPlay.poster_path)
+                    .into(moviePoster)
+
+            }
+
+        }
+        fun bindUpcoming (resultUpComing: ResultUpComing){
+            binding.apply {
+                movieTitle.text = resultUpComing.title
+                movieRating.text = "⭐  " + resultUpComing.vote_average.toString() + " / 10"
+                movieDescription.text = resultUpComing.overview
+                Glide.with(binding.root)
+                    .load("https://image.tmdb.org/t/p/w500" + resultUpComing.poster_path)
+                    .into(moviePoster)
+            }
+        }
     }
 
     interface OnItemClickListener {
         fun onItemClick(id: Int)
     }
+
     fun clearData() {
-        movieList?.clear()
-        topList?.clear()
-        popularList?.clear()
-        notifyDataSetChanged()  // Refresh the adapter
+        movieList = null
+        topList = null
+        popularList = null
+        nowPlayingList = null
+        upcomingList = null
+        notifyDataSetChanged()
     }
+
 
 }

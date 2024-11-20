@@ -8,6 +8,7 @@ import com.example.movieapp.models.PopularModel
 import com.example.movieapp.models.ResultPopular
 import com.example.movieapp.models.ResultTop
 import com.example.movieapp.models.TopRatingModel
+import com.example.movieapp.models.UpComingModel
 
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,9 +21,9 @@ interface ApiServices {
     suspend fun getMovies(
         @Query("page") page: Int
     ): MovieModel
-@GET("discover/movie")
-suspend fun searchMovies(@Query("query") query: String): MovieModel
-//    @GET("movie/{movie_id}")
+    @GET("discover/movie")
+    suspend fun searchMovies(@Query("query") query: String): MovieModel
+    //    @GET("movie/{movie_id}")
 //    suspend fun getMovieDetails(@Path("movie_id") movieId: Int): MovieResult
     @GET("movie/{movie_id}/videos")
     suspend fun getMovieVideos(@Path("movie_id") movieId: Int): MovieResult
@@ -31,16 +32,19 @@ suspend fun searchMovies(@Query("query") query: String): MovieModel
 
 
     @GET("movie/popular")
-    suspend fun getPopularMovies( @Query("page") page: Int): PopularModel
+    suspend fun getPopularMovies(
+
+    ): PopularModel
 
     // جلب الأفلام ذات التقييم الأعلى
     @GET("movie/top_rated")
-    suspend fun getTopRatedMovies( @Query("page") page: Int): TopRatingModel
+    suspend fun getTopRatedMovies( ): TopRatingModel
 
     // جلب الأفلام التي تُعرض حالياً
     @GET("movie/now_playing")
     suspend fun getNowPlayingMovies(): NowPlayModel
-
+    @GET("movie/upcoming")
+    suspend fun getUpcomingMovies(): UpComingModel
 }
 // Retrofit with Rxjava
 //@GET("posts")

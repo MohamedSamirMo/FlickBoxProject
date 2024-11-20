@@ -6,27 +6,36 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.models.DetailsModel
 import com.example.movieapp.models.MovieResult
+import com.example.movieapp.models.ResultPlay
 import com.example.movieapp.models.ResultPopular
 import com.example.movieapp.models.ResultTop
+import com.example.movieapp.models.ResultUpComing
 import com.example.movieapp.respository.MoviesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(val moviesRepository: MoviesRepository) : ViewModel() {
 
+
     val _moviesLiveData = MutableLiveData<List<MovieResult>?>()
     val moviesLiveData get() = _moviesLiveData
 
-    val _PopularLiveData = MutableLiveData<List<ResultPopular>>()
+    val _PopularLiveData = MutableLiveData<List<ResultPopular>?>()
     val PopularLiveData get() = _PopularLiveData
 
-    val _TopRatedLiveData = MutableLiveData<List<ResultTop>>()
+    val _TopRatedLiveData = MutableLiveData<List<ResultTop>?>()
     val TopRatedLiveData get() = _TopRatedLiveData
 
 
+    val _nowPlayingLiveData = MutableLiveData<List<ResultPlay>?>()
+    val nowPlayingLiveData get() = _nowPlayingLiveData
+    val _upcomingLiveData = MutableLiveData<List<ResultUpComing>?>()
+    val upcomingLiveData get() = _upcomingLiveData
 
     val _errorLiveData = MutableLiveData<String>()
     val errorLiveData get() = _errorLiveData
@@ -41,7 +50,7 @@ class MoviesViewModel @Inject constructor(val moviesRepository: MoviesRepository
 
     init {
         getMovies()
-        getPopularMovies()
+
     }
 
     private fun getMovies() {
@@ -60,40 +69,94 @@ class MoviesViewModel @Inject constructor(val moviesRepository: MoviesRepository
 
     // Fetch popular movies
     fun getPopularMovies() {
-        viewModelScope.launch {
+        // Launch the coroutine in the IO dispatcher (for network call)
+        viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Indicate that loading has started
                 _loading.postValue(true)
+
+                // Fetch popular movies from the repository
                 val movies = moviesRepository.getPopularMovies()
-                _PopularLiveData.postValue(movies)
-                _loading.postValue(false)
+
+                // Post the fetched data to the LiveData on the main thread
+                withContext(Dispatchers.Main) {
+                    _PopularLiveData.postValue(movies)
+                    _loading.postValue(false) // Set loading to false after data is fetched
+                }
+
             } catch (e: Exception) {
-                _PopularLiveData.postValue(emptyList())
-                _errorLiveData.postValue(e.message)
+                // Post empty list if there's an error
+                withContext(Dispatchers.Main) {
+                    _PopularLiveData.postValue(emptyList())  // Provide an empty list on error
+                    _errorLiveData.postValue(e.localizedMessage ?: "An error occurred")  // Show error message
+                    _loading.postValue(false)  // Ensure loading state is reset even in case of error
+                }
             }
         }
     }
 
+
     // Fetch top-rated movies
     fun getTopRatedMovies() {
-        viewModelScope.launch {
+        // Launch the coroutine in the IO dispatcher (for network call)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Indicate that loading has started
+                _loading.postValue(true)
+
+                // Fetch top-rated movies from the repository
+                val movies = moviesRepository.getTopRatedMovies()
+
+                // Post the fetched data to the LiveData on the main thread
+                withContext(Dispatchers.Main) {
+                    _TopRatedLiveData.postValue(movies)
+                    _loading.postValue(false) // Set loading to false after data is fetched
+                }
+
+            } catch (e: Exception) {
+                // Post empty list if there's an error
+                withContext(Dispatchers.Main) {
+                    _TopRatedLiveData.postValue(emptyList())  // Provide an empty list on error
+                    _errorLiveData.postValue(e.localizedMessage ?: "An error occurred")  // Show error message
+                    _loading.postValue(false)  // Ensure loading state is reset even in case of error
+                }
+            }
+        }
+    }
+    fun getUpcomingMovies(){
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 _loading.postValue(true)
-                val movies = moviesRepository.getTopRatedMovies()
-                _TopRatedLiveData.postValue(movies)
+                val data = moviesRepository.getUpcomingMovies()
+                _upcomingLiveData.postValue(data)
                 _loading.postValue(false)
-            } catch (e: Exception) {
-                _TopRatedLiveData.postValue(emptyList())
+            }
+            catch (e:Exception){
                 _errorLiveData.postValue(e.message)
             }
+        }
+
+    }
+    fun getNowPlayingMovies() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _loading.postValue(true)
+                val data = moviesRepository.getNowPlayingMovies()
+                _nowPlayingLiveData.postValue(data)
+                _loading.postValue(false)
+            } catch (e: Exception) {
+                _errorLiveData.postValue(e.message)
+            }
+
         }
     }
 
     fun clearPopularData() {
-        _PopularLiveData.value = emptyList()
+        _PopularLiveData.postValue(emptyList())
     }
 
     fun clearTopRatedData() {
-        _TopRatedLiveData.value = emptyList()
+        _TopRatedLiveData.postValue(emptyList())
     }
     fun searchMovies(query: String) {
         viewModelScope.launch {

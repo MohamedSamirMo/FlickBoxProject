@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.movieapp.R
 
 import com.example.movieapp.adpater.MoviesAdapter
-import com.example.movieapp.adpater.MoviesPagerAdapter
 import com.example.movieapp.databinding.FragmentHomeBinding
 import com.example.movieapp.models.ResultPopular
 import com.example.movieapp.models.ResultTop
@@ -30,69 +29,141 @@ class HomeFragment : Fragment() {
 
     private val moviesViewModel: MoviesViewModel by viewModels()
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        moviesAdapter.onItemClickListener = object : MoviesAdapter.OnItemClickListener {
-            override fun onItemClick(id: Int) {
-                val navController = findNavController()
 
-                // Check if the current destination is not already DetailsFragment2
-                if (navController.currentDestination?.id != R.id.detailsFragment2) {
-                    navController.navigate(HomeFragmentDirections.actionHomeFragment2ToDetailsFragment2(id))
-                }
+        // Handle item click navigation
+        moviesAdapter.onItemClickListener = object : MoviesAdapter.OnItemClickListener {
+            override fun onItemClick(id: Int ) {
+                val navController = findNavController()
+                navController.navigate(HomeFragmentDirections.actionHomeFragment2ToDetailsFragment2(id))
+
+
             }
         }
 
         _binding = FragmentHomeBinding.bind(view)
-
-        // Observe data from ViewModel
         observeData()
 
-        // On click for Popular Tab
+        binding.tabUpComing.setOnClickListener({
+            moviesViewModel.getUpcomingMovies()
+            observeDataUpcoming()
+
+
+        })
+        binding.tabNowPlay.setOnClickListener({
+
+            moviesViewModel.getNowPlayingMovies()
+            observeDataNowPlaying()
+
+        })
+
+
+        // Popular tab click listener
         binding.tabPopular.setOnClickListener {
-            moviesViewModel.clearPopularData()
-            observeDataPopular()
-            moviesViewModel.getPopularMovies()
+            moviesViewModel.getPopularMovies() // Fetch popular movies
+            observeDataPopular() // Start observing for popular movies
 
         }
 
-        // On click for Top Rated Tab
+        // Top rated tab click listener
         binding.tabTopRated.setOnClickListener {
-            moviesViewModel.clearTopRatedData()
-            observeDataTopRating()
+            // Fetch top rated movies
             moviesViewModel.getTopRatedMovies()
+            // Reset previous data to avoid repeating it in RecyclerView
+            moviesViewModel.clearTopRatedData()
+
+            // Observe data for top rated movies
+            observeDataTopRating()
+
+
         }
 
-        // On click for Search Icon, navigate to SearchFragment
+        // Search icon click listener
         binding.iconSearch.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment2_to_searchFragment)
         }
-
-//        // On click for Search Icon
-//        binding.iconSearch.setOnClickListener {
-//            val query = binding.searchInput.text.toString()
-//            if (query.isNotEmpty()) {
-//                searchMovies(query)
-//            } else {
-//                Toast.makeText(requireContext(), "Please enter a search term", Toast.LENGTH_SHORT).show()
-//            }
-//        }
     }
 
+    // Function to observe and update popular movie data
+    private fun observeDataPopular() {
+        binding.progressBar.visibility = View.VISIBLE
+
+        // Observe popular movie data
+        moviesViewModel.PopularLiveData.observe(viewLifecycleOwner) { popularList ->
+            binding.progressBar.visibility = View.GONE
+            if (popularList != null) {
+                moviesAdapter.popularList = ArrayList(popularList)
+
+            } else {
+                moviesAdapter.popularList = ArrayList() // Clear list if no data
+            }
+            binding.recMovie.adapter = moviesAdapter
+            moviesAdapter.notifyDataSetChanged()
+        }
+    }
+
+    // Function to observe and update top rated movie data
+    private fun observeDataTopRating() {
+        binding.progressBar.visibility = View.VISIBLE
+
+        // Observe top rated movie data
+        moviesViewModel.TopRatedLiveData.observe(viewLifecycleOwner) { topRatingList ->
+            binding.progressBar.visibility = View.GONE
+            if (topRatingList != null) {
+                moviesAdapter.topList = ArrayList(topRatingList)
+            } else {
+                moviesAdapter.topList = ArrayList() // Clear list if no data
+            }
+            binding.recMovie.adapter = moviesAdapter
+            moviesAdapter.notifyDataSetChanged()
+        }
+    }
+    private fun observeDataNowPlaying() {
+        binding.progressBar.visibility = View.VISIBLE
+        moviesViewModel.nowPlayingLiveData.observe(viewLifecycleOwner) { nowPlayingList ->
+            binding.progressBar.visibility = View.GONE
+
+            if (nowPlayingList != null) {
+                moviesAdapter.nowPlayingList = ArrayList(nowPlayingList)
+            } else {
+                moviesAdapter.nowPlayingList = ArrayList()
+            }
+            binding.recMovie.adapter = moviesAdapter
+            moviesAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun observeDataUpcoming(){
+        binding.progressBar.visibility = View.VISIBLE
+        moviesViewModel.upcomingLiveData.observe(viewLifecycleOwner){
+                upcomingList->
+            binding.progressBar.visibility = View.GONE
+
+            if (upcomingList != null){
+                moviesAdapter.upcomingList = ArrayList(upcomingList)
+            }else{
+                moviesAdapter.upcomingList = ArrayList()
+            }
+            binding.recMovie.adapter = moviesAdapter
+            moviesAdapter.notifyDataSetChanged()
+        }
+    }
+
+    // Observe all movie data from ViewModel (for other categories)
     private fun observeData() {
         binding.progressBar.visibility = View.VISIBLE
 
-        // Observe movie data from ViewModel
+        // Observe movie data
         moviesViewModel.moviesLiveData.observe(viewLifecycleOwner) { movieList ->
             binding.progressBar.visibility = View.GONE
             if (movieList != null) {
@@ -101,61 +172,8 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    private fun observeDataPopular() {
-        binding.progressBar.visibility = View.VISIBLE
 
-        // Observe movie data from ViewModel
-        moviesViewModel.PopularLiveData.observe(viewLifecycleOwner) { popularList ->
-            binding.progressBar.visibility = View.GONE
-            if (popularList != null && popularList.isNotEmpty()) {
-                // إذا كانت القائمة تحتوي على بيانات
-                moviesAdapter.popularList = ArrayList(popularList)
-            } else {
-                // إذا كانت القائمة فارغة، قم بتعيين قائمة فارغة
-
-                moviesAdapter.popularList = ArrayList() // تأكد من أن تكون القائمة فارغة بشكل صحيح
-            }
-            binding.recMovie.adapter = moviesAdapter
-            moviesAdapter.notifyDataSetChanged()
-        }
-    }
-
-    private fun observeDataTopRating() {
-        binding.progressBar.visibility = View.VISIBLE
-
-        // Observe movie data from ViewModel
-        moviesViewModel.TopRatedLiveData.observe(viewLifecycleOwner) { topRatingList ->
-            binding.progressBar.visibility = View.GONE
-            if (topRatingList != null && topRatingList.isNotEmpty()) {
-                // إذا كانت القائمة تحتوي على بيانات
-                moviesAdapter.topList = ArrayList(topRatingList)
-            } else {
-                // إذا كانت القائمة فارغة، قم بتعيين قائمة فارغة
-
-                moviesAdapter.topList = ArrayList() // تأكد من أن تكون القائمة فارغة بشكل صحيح
-            }
-            binding.recMovie.adapter = moviesAdapter
-            moviesAdapter.notifyDataSetChanged()
-        }
-    }
-
-
-
-
-
-
-//    private fun fetchMovies() {
-//
-//        when (currentCategory) {
-//            "Popular" -> moviesViewModel.getPopularMovies()
-//            "Top Rated" -> moviesViewModel.getTopRatedMovies()
-//        }
-//    }
-
-    private fun searchMovies(query: String) {
-        moviesViewModel.searchMovies(query) // Pass the query to ViewModel
-    }
-
+    // Clear references when fragment is destroyed
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

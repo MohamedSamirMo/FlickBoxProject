@@ -4,8 +4,10 @@ import com.example.movieapp.local.MyDao
 import com.example.movieapp.models.DetailsModel
 import com.example.movieapp.models.MovieResult
 import com.example.movieapp.models.PopularModel
+import com.example.movieapp.models.ResultPlay
 import com.example.movieapp.models.ResultPopular
 import com.example.movieapp.models.ResultTop
+import com.example.movieapp.models.ResultUpComing
 import com.example.movieapp.models.TopRatingModel
 import com.example.movieapp.network.ApiServices
 import javax.inject.Inject
@@ -60,7 +62,9 @@ class MoviesRepository @Inject constructor(val dao: MyDao, val apiServices: ApiS
 
         try {
             // Extract the results from the response
-            val response = apiServices.getPopularMovies(1)
+            val response = apiServices.getPopularMovies(
+
+            )
             return response.results ?: emptyList()
         }catch (e:Exception){
             getFromCache()
@@ -87,20 +91,39 @@ class MoviesRepository @Inject constructor(val dao: MyDao, val apiServices: ApiS
 
 
 
-}
+    }
     // Fetch top-rated movies from the API
     suspend fun getTopRatedMovies(): List<ResultTop> {
         try {
-            val response = apiServices.getTopRatedMovies(1)
+            val response = apiServices.getTopRatedMovies()
             return response.results ?: emptyList() // Extract the results from the response
 
         }catch (e:Exception){
             getFromCache()
         }
-     return emptyList()
+        return emptyList()
 
     }
+    suspend fun getUpcomingMovies(): List<ResultUpComing> {
+        try {
+            val response = apiServices.getUpcomingMovies()
+            return response.results ?: emptyList() // Extract the results from the response
 
+        }catch (e:Exception){
+            getFromCache()
+        }
+        return emptyList()
+
+    }
+    suspend fun getNowPlayingMovies(): List<ResultPlay> {
+        try {
+            val response = apiServices.getNowPlayingMovies()
+            return response.results ?: emptyList() // Extract the results from the response
+        } catch (e: Exception) {
+            getFromCache()
+        }
+        return emptyList()
+    }
     // جلب تفاصيل الفيلم من الشبكة أو الكاش
     suspend fun getMovieDetails(movieId: Int): DetailsModel? {
         return try {
