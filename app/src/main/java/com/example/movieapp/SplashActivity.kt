@@ -1,6 +1,8 @@
 package com.example.movieapp
 
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -21,6 +23,13 @@ class SplashActivity : AppCompatActivity() {
         }
         setContentView(binding.root)
 
+
+        // تغيير لون شريط التنقل السفلي على الأجهزة التي تعمل بنظام Android 10 أو أحدث
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            window.navigationBarColor = Color.BLACK // تغيير لون شريط التنقل السفلي
+            window.statusBarColor = Color.BLACK // تغيير لون شريط الحالة
+
+        }
 
         // Access the LottieAnimationView using view binding
         binding.lottieAnimation.playAnimation() // Play the animation

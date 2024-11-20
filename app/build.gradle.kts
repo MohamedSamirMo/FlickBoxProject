@@ -61,6 +61,22 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.intuit.sdp:sdp-android:1.1.1")
 
+    // unit testing
+    testImplementation("org.mockito:mockito-core:3.11.2")
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.mockito:mockito-inline:3.11.2")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    dependencies {
+
+
+        // Coroutines test library
+        testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
+
+        // LiveData test utilities
+        testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    }
+
     // lottie Animation
     implementation ("com.airbnb.android:lottie:6.6.0")
     //Glide Image
